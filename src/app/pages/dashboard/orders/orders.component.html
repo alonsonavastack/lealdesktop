@@ -1,0 +1,182 @@
+<div class="min-h-screen bg-gray-900 p-4 sm:p-6 lg:p-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Products List -->
+      <div class="lg:col-span-2">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6">
+          <h2 class="text-yellow-300 text-xl font-bold mb-4">Productos Disponibles</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (product of products(); track product.id) {
+              <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors">
+                <div class="flex flex-col space-y-2">
+                  <h3 class="text-yellow-300 font-bold">{{ product.name }}</h3>
+                  <p class="text-gray-300">${{ product.price }}</p>
+                  <p class="text-sm text-gray-400">{{ product.points }} pts</p>
+                  <p class="text-sm text-gray-400">Stock: {{ product.quantity }}</p>
+                  <button 
+                    (click)="addToOrder(product)"
+                    class="bg-yellow-500 text-gray-900 px-3 py-2 rounded-lg hover:bg-yellow-600 font-bold">
+                    Agregar al Pedido
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6">
+          <h2 class="text-yellow-300 text-xl font-bold mb-4">Orden Actual</h2>
+          
+          <form [formGroup]="orderForm" (ngSubmit)="completeOrder()" class="space-y-4">
+            <!-- Customer Selection -->
+            <div>
+              <label class="block text-yellow-300 mb-2">Cliente</label>
+              <div class="flex gap-2">
+                <input 
+                  type="text"
+                  formControlName="customerName"
+                  readonly
+                  class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5"
+                  placeholder="Seleccionar cliente">
+                <button 
+                  type="button"
+                  (click)="openCustomerModal()"
+                  class="bg-yellow-500 text-gray-900 px-4 rounded-lg hover:bg-yellow-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="mt-6">
+              @if (currentOrder().length === 0) {
+                <p class="text-gray-400 text-center py-4">No hay productos en la orden</p>
+              } @else {
+                <div class="space-y-4">
+                  @for (item of currentOrder(); track item.productId) {
+                    <div class="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
+                      <div>
+                        <p class="text-yellow-300">{{ item.name }}</p>
+                        <p class="text-sm text-gray-400">
+                          ${{ item.price }} x {{ item.quantity }} = ${{ item.subtotal }}
+                        </p>
+                        <p class="text-sm text-green-500">{{ item.totalPoints }} pts</p>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <button 
+                          type="button"
+                          (click)="updateQuantity(item.productId, item.quantity - 1)"
+                          class="text-yellow-300 hover:text-yellow-400 w-8 h-8 flex items-center justify-center">
+                          -
+                        </button>
+                        <span class="text-yellow-300 w-8 text-center">{{ item.quantity }}</span>
+                        <button 
+                          type="button"
+                          (click)="updateQuantity(item.productId, item.quantity + 1)"
+                          class="text-yellow-300 hover:text-yellow-400 w-8 h-8 flex items-center justify-center">
+                          +
+                        </button>
+                        <button 
+                          type="button"
+                          (click)="removeFromOrder(item.productId)"
+                          class="text-red-400 hover:text-red-500 ml-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- Totals -->
+                  <div class="border-t border-gray-700 pt-4 mt-4 space-y-2">
+                    <div class="flex justify-between text-gray-300">
+                      <span>Subtotal:</span>
+                      <span>${{ calculateTotals().subtotal.toFixed(2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-yellow-300 font-bold text-lg">
+                      <span>Total:</span>
+                      <span>${{ calculateTotals().subtotal.toFixed(2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-green-500">
+                      <span>Puntos a Ganar:</span>
+                      <span>{{ calculateTotals().pointsEarned }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Payment Method -->
+                  <div class="mt-4">
+                    <label class="block text-yellow-300 mb-2">Método de Pago</label>
+                    <select 
+                      formControlName="paymentMethod"
+                      class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
+                      <option value="cash">Efectivo</option>
+                      <option value="card">Tarjeta</option>
+                      <option value="points">Puntos</option>
+                    </select>
+                  </div>
+
+                  <!-- Complete Order Button -->
+                  <button 
+                    type="submit"
+                    [disabled]="!orderForm.valid || isLoading()"
+                    class="w-full mt-6 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    @if (isLoading()) {
+                      <span>Procesando...</span>
+                    } @else {
+                      <span>Completar Orden</span>
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Search Modal -->
+@if (showCustomerModal()) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-yellow-300 text-lg font-bold">Buscar Cliente</h3>
+        <button 
+          (click)="closeCustomerModal()"
+          class="text-gray-400 hover:text-gray-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="mb-4">
+        <input 
+          type="text"
+          [(ngModel)]="customerSearch"
+          [ngModelOptions]="{standalone: true}"
+          (input)="filterCustomers()"
+          class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5"
+          placeholder="Buscar por nombre o teléfono">
+      </div>
+
+      <div class="max-h-60 overflow-y-auto">
+        @for (customer of filteredCustomers(); track customer.id) {
+          <button
+            (click)="selectCustomer(customer)"
+            class="w-full text-left p-3 hover:bg-gray-700 rounded-lg mb-2 transition-colors">
+            <p class="text-yellow-300 font-medium">{{ customer.name }}</p>
+            <p class="text-gray-400 text-sm">{{ customer.phone }}</p>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

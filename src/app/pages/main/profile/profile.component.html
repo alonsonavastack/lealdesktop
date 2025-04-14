@@ -1,0 +1,182 @@
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button 
+      (click)="navigateToMain()"
+      class="mb-6 flex items-center text-gray-600 hover:text-gray-900">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+      </svg>
+      Volver al Inicio
+    </button>
+      <!-- Profile Header -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+          <div class="relative">
+            <img 
+              [src]="user.profileImage || 'assets/default-avatar.png'" 
+              alt="Profile"
+              class="w-24 h-24 rounded-full object-cover border-4 border-yellow-500">
+            <button class="absolute bottom-0 right-0 bg-yellow-500 p-2 rounded-full text-white hover:bg-yellow-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </button>
+          </div>
+          <div class="flex-1">
+            <h1 class="text-2xl font-bold text-gray-900">{{ user.name }}</h1>
+            <p class="text-gray-500">{{ user.email }}</p>
+            <div class="mt-2 flex flex-wrap gap-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                Miembro desde {{ user.joinDate | date:'MMM yyyy' }}
+              </span>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                {{ user.totalPoints }} puntos acumulados
+              </span>
+            </div>
+          </div>
+          <button (click)="navigateToEdit()" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors">
+            Editar Perfil
+          </button>
+        </div>
+      </div>
+  
+      <!-- Points Card -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Puntos Disponibles</h2>
+            <span class="text-3xl font-bold text-yellow-500">{{ user.availablePoints }}</span>
+          </div>
+          <div class="space-y-2">
+            <div class="relative pt-1">
+              <div class="flex mb-2 items-center justify-between">
+                <div>
+                  <span class="text-xs font-semibold inline-block text-yellow-600">
+                    Nivel {{ user.level }}
+                  </span>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs font-semibold inline-block text-yellow-600">
+                    {{ user.pointsProgress }}%
+                  </span>
+                </div>
+              </div>
+              <div class="overflow-hidden h-2 text-xs flex rounded bg-yellow-200">
+                <div 
+                  [style.width.%]="user.pointsProgress"
+                  class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-500">
+                </div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-500">
+              {{ user.pointsToNextLevel }} puntos más para el siguiente nivel
+            </p>
+          </div>
+        </div>
+  
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Estadísticas</h2>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Total Compras</span>
+              <span class="font-semibold">{{ user.totalPurchases }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Puntos Canjeados</span>
+              <span class="font-semibold">{{ user.redeemedPoints }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-600">Ahorro Total</span>
+              <span class="font-semibold text-green-600">${{ user.totalSavings }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4">Beneficios del Nivel</h2>
+          <ul class="space-y-2">
+            @for (benefit of currentLevelBenefits; track benefit) {
+              <li class="flex items-center text-sm text-gray-600">
+                <svg class="h-5 w-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                {{ benefit }}
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+  
+      <!-- Purchase History -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-semibold">Historial de Compras</h2>
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm"
+              placeholder="Buscar compras..."
+              class="px-3 py-2 border rounded-lg text-sm">
+            <select 
+              [(ngModel)]="filterPeriod"
+              class="px-3 py-2 border rounded-lg text-sm bg-white">
+              <option value="all">Todas</option>
+              <option value="month">Este Mes</option>
+              <option value="year">Este Año</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orden #</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntos</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @for (purchase of filteredPurchases(); track purchase.id) {
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ purchase.date | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    #{{ purchase.orderNumber }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${{ purchase.total }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">
+                    +{{ purchase.pointsEarned }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span [class]="getStatusClass(purchase.status)">
+                      {{ purchase.status }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button 
+                      (click)="viewPurchaseDetails(purchase)"
+                      class="text-yellow-600 hover:text-yellow-900">
+                      Ver Detalles
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+  
+        @if (filteredPurchases().length === 0) {
+          <div class="text-center py-8 text-gray-500">
+            No se encontraron compras que coincidan con tu búsqueda
+          </div>
+        }
+      </div>
+    </div>
+  </div>
