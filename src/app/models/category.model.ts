@@ -5,5 +5,5 @@ export interface Category {
     image?: string;
     isActive: boolean;
     createdAt: Date;
-    updatedAt?: Date;
+    updatedAt?: Date | null;
 }

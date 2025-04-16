@@ -1,10 +1,12 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { initializeApp } from 'firebase/app';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { provideHotToastConfig } from '@ngxpert/hot-toast';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA-9Y0tFmUUssVZD-DcJPzaRnK7FeBXCSU",
@@ -22,11 +24,14 @@ initializeApp(firebaseConfig)
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }), 
-    provideRouter(routes),
+    provideRouter(routes, withHashLocation()),
+    provideAnimations(),
     provideHttpClient(),
     importProvidersFrom(
       AngularFireModule.initializeApp(firebaseConfig),
       AngularFirestoreModule
-    )
+    ), 
+    provideHotToastConfig(),
+    
   ]
 };

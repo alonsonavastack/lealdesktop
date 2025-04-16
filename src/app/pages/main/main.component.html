@@ -1,185 +1,185 @@
-<div class="min-h-screen bg-gray-100">
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <h1 class="text-2xl font-bold text-gray-900">Leal Desktop</h1>
-          
-          <div class="flex items-center space-x-4 sm:space-x-6">
+<div class="min-h-screen bg-gray-900">
+  <!-- Header -->
+  <header class="bg-gray-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-yellow-300">Leal Desktop</h1>
+        
+        <div class="flex items-center space-x-4">
+          <!-- Cart Button -->
+          <button 
+            (click)="toggleCart()"
+            class="relative text-yellow-300 hover:text-yellow-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            @if (cartItems().length > 0) {
+              <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {{ cartItems().length }}
+              </span>
+            }
+          </button>
+
+          <!-- User Menu -->
+          <div class="relative">
             @if (!isLoggedIn()) {
               <button 
                 (click)="login()"
-                class="text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+                class="text-yellow-300 hover:text-yellow-400 px-4 py-2 rounded-lg border border-yellow-300 hover:border-yellow-400">
                 Iniciar Sesión
               </button>
             } @else {
-              <div class="relative">
-                <button 
-                  (click)="toggleUserMenu()"
-                  class="flex items-center space-x-2 text-gray-600 hover:text-gray-900 text-sm sm:text-base">
-                  <span>{{ currentUser().name }}</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-  
-                @if (showUserMenu()) {
-                  <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                    <a 
-                      href="/profile"
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Mi Perfil
-                    </a>
-                    <button 
-                      (click)="logout()"
-                      class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Cerrar Sesión
-                    </button>
-                  </div>
-                }
-              </div>
-            }
-  
-            <button 
-              (click)="toggleCart()" 
-              class="relative p-2 text-gray-600 hover:text-gray-900">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              @if (cartItems().length > 0) {
-                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {{ cartItems().length }}
-                </span>
+              <button 
+                (click)="toggleUserMenu()"
+                class="flex items-center space-x-2 text-yellow-300 hover:text-yellow-400">
+                <span>{{ currentUser()?.name }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+
+              @if (showUserMenu()) {
+                <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl py-2 z-50">
+                  <button 
+                    (click)="goToProfile()"
+                    class="block w-full text-left px-4 py-2 text-yellow-300 hover:bg-gray-700">
+                    Mi Perfil
+                  </button>
+                  <button 
+                    (click)="logout()"
+                    class="block w-full text-left px-4 py-2 text-red-400 hover:bg-gray-700">
+                    Cerrar Sesión
+                  </button>
+                </div>
               }
-            </button>
+            }
           </div>
         </div>
       </div>
-    </header>
-  
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Categories -->
-      <div class="mb-8">
-        <div class="flex flex-wrap gap-2 sm:gap-4">
-          <button 
-            (click)="filterByCategory('all')"
-            [class.bg-yellow-500]="selectedCategory() === 'all'"
-            class="px-4 py-2 rounded-full text-sm font-medium hover:bg-yellow-400 transition-colors bg-white shadow-sm">
-            Todos
-          </button>
-          @for (category of categories; track category) {
-            <button 
-              (click)="filterByCategory(category)"
-              [class.bg-yellow-500]="selectedCategory() === category"
-              class="px-4 py-2 rounded-full text-sm font-medium hover:bg-yellow-400 transition-colors bg-white shadow-sm">
-              {{ category }}
-            </button>
-          }
-        </div>
-      </div>
-  
-      <!-- Products Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        @for (product of filteredProducts(); track product.id) {
-          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Categories -->
+    <div class="flex space-x-4 mb-8 overflow-x-auto pb-2">
+      <button 
+        (click)="filterByCategory('all')"
+        [class.bg-yellow-500]="selectedCategory() === 'all'"
+        [class.text-gray-900]="selectedCategory() === 'all'"
+        [class.bg-gray-800]="selectedCategory() !== 'all'"
+        [class.text-yellow-300]="selectedCategory() !== 'all'"
+        class="px-4 py-2 rounded-lg hover:bg-yellow-400 hover:text-gray-900 transition-colors whitespace-nowrap">
+        Todos
+      </button>
+      @for (category of categories(); track category.id) {
+        <button 
+          (click)="filterByCategory(category.id)"
+          [class.bg-yellow-500]="selectedCategory() === category.id"
+          [class.text-gray-900]="selectedCategory() === category.id"
+          [class.bg-gray-800]="selectedCategory() !== category.id"
+          [class.text-yellow-300]="selectedCategory() !== category.id"
+          class="px-4 py-2 rounded-lg hover:bg-yellow-400 hover:text-gray-900 transition-colors whitespace-nowrap">
+          {{ category.name }}
+        </button>
+      }
+    </div>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (product of filteredProducts(); track product.id) {
+        @if (product.isActive) {
+          <div class="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
             <img [src]="product.image" [alt]="product.name" class="w-full h-48 object-cover">
             <div class="p-4">
-              <h3 class="text-lg font-semibold text-gray-900">{{ product.name }}</h3>
-              <p class="text-sm text-gray-500 mt-1">{{ product.description }}</p>
-              <div class="mt-4 space-y-2">
-                <div class="flex justify-between items-center">
-                  <span class="text-lg font-bold text-gray-900">${{ product.price }}</span>
-                  <span class="text-sm text-green-600">{{ product.points }} pts</span>
-                </div>
-                <button 
-                  (click)="addToCart(product)"
-                  class="w-full bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors">
-                  Agregar al Carrito
-                </button>
+              <h3 class="text-xl font-bold text-yellow-300">{{ product.name }}</h3>
+              <p class="text-gray-400 mt-2">{{ product.description }}</p>
+              <div class="mt-4 flex justify-between items-center">
+                <span class="text-yellow-300">${{ product.price }}</span>
+                @if (product.isPointsProduct) {
+                  <span class="text-green-500">{{ product.pointsCost }} pts</span>
+                } @else {
+                  <span class="text-yellow-300">{{ product.points }} puntos</span>
+                }
               </div>
+              <button 
+                (click)="addToCart(product)"
+                [disabled]="product.quantity <= 0"
+                class="mt-4 w-full bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed">
+                {{ product.quantity > 0 ? 'Agregar al Carrito' : 'Sin Stock' }}
+              </button>
             </div>
           </div>
         }
-      </div>
-    </main>
-  
-    <!-- Shopping Cart Sidebar -->
-    @if (showCart()) {
-      <div class="fixed inset-0 z-40" (click)="toggleCart()"></div>
-      <div class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform transition-transform duration-300">
-        <div class="p-6 h-full flex flex-col">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold">Carrito de Compras</h2>
-            <button (click)="toggleCart()" class="text-gray-500 hover:text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-  
-          <div class="flex-1 overflow-y-auto">
-            @if (cartItems().length === 0) {
-              <div class="flex flex-col items-center justify-center h-full text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                <p class="text-center">Tu carrito está vacío</p>
-              </div>
-            } @else {
-              <div class="space-y-4">
-                @for (item of cartItems(); track item.id) {
-                  <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
-                    <div class="flex-1">
-                      <h4 class="font-medium">{{ item.name }}</h4>
-                      <p class="text-sm text-gray-500">${{ item.price }} x {{ item.quantity }}</p>
-                      <p class="text-sm text-green-600">{{ item.points * item.quantity }} pts</p>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <button 
-                        (click)="updateQuantity(item, -1)"
-                        class="text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
-                        -
-                      </button>
-                      <span class="w-8 text-center">{{ item.quantity }}</span>
-                      <button 
-                        (click)="updateQuantity(item, 1)"
-                        class="text-gray-500 hover:text-gray-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
-                        +
-                      </button>
-                      <button 
-                        (click)="removeFromCart(item)"
-                        class="text-red-500 hover:text-red-700 ml-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                      </button>
-                    </div>
+      }
+    </div>
+  </main>
+
+  <!-- Shopping Cart Sidebar -->
+  @if (showCart()) {
+    <div class="fixed inset-0 z-40">
+      <div class="absolute right-0 top-0 h-full w-full max-w-md bg-gray-800/90 backdrop-blur-sm shadow-xl">
+        <div class="p-4 flex justify-between items-center border-b border-gray-700">
+          <h2 class="text-xl font-bold text-yellow-300">Carrito de Compras</h2>
+          <button 
+            (click)="toggleCart()"
+            class="text-gray-400 hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-4">
+          @if (cartItems().length === 0) {
+            <p class="text-center text-gray-400">Tu carrito está vacío</p>
+          } @else {
+            <div class="space-y-4">
+              @for (item of cartItems(); track item.id) {
+                <div class="flex items-center space-x-4">
+                  <img [src]="item.image" [alt]="item.name" class="w-16 h-16 object-cover rounded">
+                  <div class="flex-1">
+                    <h3 class="text-yellow-300">{{ item.name }}</h3>
+                    <p class="text-gray-400">${{ item.price }} | {{ item.points }} puntos</p>
                   </div>
-                }
-              </div>
-            }
-          </div>
-  
-          @if (cartItems().length > 0) {
-            <div class="mt-6 pt-6 border-t">
-              <div class="flex justify-between text-lg font-bold mb-6">
-                <span>Total:</span>
-                <div class="text-right">
-                  <div>${{ calculateTotal().toFixed(2) }}</div>
-                  <div class="text-sm text-green-600 font-normal">
-                    {{ calculateTotalPoints() }} pts
+                  <div class="flex items-center space-x-2">
+                    <button 
+                      (click)="updateQuantity(item, -1)"
+                      class="text-yellow-300 hover:text-yellow-400">-</button>
+                    <span class="text-yellow-300">{{ item.quantity }}</span>
+                    <button 
+                      (click)="updateQuantity(item, 1)"
+                      class="text-yellow-300 hover:text-yellow-400">+</button>
                   </div>
+                  <button 
+                    (click)="removeFromCart(item)"
+                    class="text-red-400 hover:text-red-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
                 </div>
+              }
+            </div>
+
+            <div class="mt-6 border-t border-gray-700 pt-4">
+              <div class="flex justify-between text-yellow-300">
+                <span>Total:</span>
+                <span>${{ calculateTotal() }}</span>
+              </div>
+              <div class="flex justify-between text-yellow-300 mt-2">
+                <span>Puntos a ganar:</span>
+                <span>{{ calculateTotalPoints() }}</span>
               </div>
               <button 
                 (click)="proceedToCheckout()"
-                class="w-full bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600 transition-colors">
+                class="mt-4 w-full bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors">
                 Proceder al Pago
               </button>
             </div>
           }
         </div>
       </div>
-    }
-  </div>
+    </div>
+  }
+</div>

@@ -1,36 +1,36 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Product } from '../../../models/products.model';
+import { Category } from '../../../models/category.model';
+import { FirebaseService } from '../../../services/firebase.service';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
-  selector: 'app-productos',
+  selector: 'app-products',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './productos.component.html'
 })
-export class ProductosComponent {
+export class ProductosComponent implements OnInit {
+  private firebaseSvc = inject(FirebaseService);
+  private toast = inject(HotToastService);
+  private fb = inject(FormBuilder);
+
   products = signal<Product[]>([]);
+  categories = signal<Category[]>([]);
   isLoading = signal<boolean>(false);
   showForm = signal<boolean>(false);
   selectedProduct = signal<Product | null>(null);
-  
-  categories = [
-    'Electrónicos',
-    'Ropa',
-    'Alimentos',
-    'Hogar',
-    'Belleza',
-    'Deportes'
-  ];
 
+  // Change from FormGroup to FormGroup instance
   productForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.productForm = this.fb.group({
-      id: [null],
       name: ['', [Validators.required]],
-      price: [0, [Validators.required, Validators.min(0)]],
-      image: ['', [Validators.required]],
+      price: ['', [Validators.required, Validators.min(0)]],
+      image: ['', [Validators.required, Validators.pattern('https?://.+')]],
       description: ['', [Validators.required]],
       category: ['', [Validators.required]],
       quantity: [0, [Validators.required, Validators.min(0)]],
@@ -40,60 +40,96 @@ export class ProductosComponent {
       maxPointsPerPurchase: [null],
       isPointsProduct: [false],
       pointsCost: [null],
-      isActive: [true],
-      createdAt: [new Date()],
-      updatedAt: [null]
-    });
-
-    // Habilitar/deshabilitar pointsCost según isPointsProduct
-    this.productForm.get('isPointsProduct')?.valueChanges.subscribe(isPointsProduct => {
-      const pointsCostControl = this.productForm.get('pointsCost');
-      if (isPointsProduct) {
-        pointsCostControl?.setValidators([Validators.required, Validators.min(1)]);
-      } else {
-        pointsCostControl?.clearValidators();
-        pointsCostControl?.setValue(null);
-      }
-      pointsCostControl?.updateValueAndValidity();
+      isActive: [true]
     });
   }
 
-  onSubmit() {
+  ngOnInit() {
+    this.loadCategories();
+    this.loadProducts();
+  }
+
+  async loadCategories() {
+    try {
+      const data = await this.firebaseSvc.getCollectionData('categories');
+      this.categories.set(data as Category[]);
+    } catch (error) {
+      this.toast.error('Error al cargar categorías');
+    }
+  }
+
+  async loadProducts() {
+    try {
+      this.isLoading.set(true);
+      const data = await this.firebaseSvc.getCollectionData('products');
+      this.products.set(data as any[]);
+    } catch (error) {
+      this.toast.error('Error al cargar productos');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async onSubmit() {
     if (this.productForm.valid) {
       this.isLoading.set(true);
       const formData = this.productForm.value;
       
-      const product = new Product(
-        formData.id || Date.now(),
-        formData.name,
-        formData.price,
-        formData.image,
-        formData.description,
-        formData.category,
-        formData.quantity,
-        formData.points,
-        formData.pointsMultiplier,
-        formData.minPurchaseForPoints,
-        formData.maxPointsPerPurchase,
-        formData.isPointsProduct,
-        formData.pointsCost,
-        formData.createdAt,
-        new Date(),
-        formData.isActive
-      );
+      try {
+        if (this.selectedProduct()) {
+          const productId = this.selectedProduct()!.id;
+          await this.firebaseSvc.updateDocument(`products/${productId}`, {
+            ...formData,
+            updatedAt: new Date()
+          });
+          this.toast.success('Producto actualizado exitosamente');
+        } else {
+          await this.firebaseSvc.addDocument('products', {
+            ...formData,
+            createdAt: new Date(),
+            updatedAt: null
+          });
+          this.toast.success('Producto creado exitosamente');
+        }
 
-      if (this.selectedProduct()) {
-        this.products.update(products => 
-          products.map(p => p.id === product.id ? product : p)
-        );
-      } else {
-        this.products.update(products => [...products, product]);
+        this.loadProducts();
+        this.showForm.set(false);
+        this.productForm.reset({
+          isActive: true,
+          pointsMultiplier: 1,
+          minPurchaseForPoints: 1,
+          points: 0,
+          quantity: 0,
+          isPointsProduct: false
+        });
+        this.selectedProduct.set(null);
+      } catch (error) {
+        this.toast.error('Error al guardar el producto');
+      } finally {
+        this.isLoading.set(false);
       }
-
-      this.isLoading.set(false);
-      this.showForm.set(false);
-      this.productForm.reset();
+    } else {
+      Object.keys(this.productForm.controls).forEach(key => {
+        const control = this.productForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
+        }
+      });
     }
+  }
+
+  // Add this method to handle points product changes
+  onPointsProductChange() {
+    const isPointsProduct = this.productForm.get('isPointsProduct')?.value;
+    if (isPointsProduct) {
+      this.productForm.get('pointsCost')?.setValidators([Validators.required, Validators.min(0)]);
+      this.productForm.get('points')?.setValue(0);
+      this.productForm.get('pointsMultiplier')?.setValue(1);
+    } else {
+      this.productForm.get('pointsCost')?.clearValidators();
+      this.productForm.get('pointsCost')?.setValue(null);
+    }
+    this.productForm.get('pointsCost')?.updateValueAndValidity();
   }
 
   editProduct(product: Product) {
@@ -102,36 +138,36 @@ export class ProductosComponent {
     this.showForm.set(true);
   }
 
-  deleteProduct(id: number) {
-    if (confirm('¿Estás seguro de eliminar este producto?')) {
-      this.products.update(products => products.filter(p => p.id !== id));
-    }
+  async deleteProduct(id: string | number) {
+      if (!id) {
+          this.toast.error('ID de producto no válido');
+          return;
+      }
+  
+      if (confirm('¿Estás seguro de eliminar este producto?')) {
+          try {
+              this.isLoading.set(true);
+              await this.firebaseSvc.deleteDocument(`products/${String(id)}`);
+              this.toast.success('Producto eliminado exitosamente');
+              this.loadProducts();
+          } catch (error) {
+              this.toast.error('Error al eliminar el producto');
+          } finally {
+              this.isLoading.set(false);
+          }
+      }
   }
 
   toggleForm() {
     this.showForm.update(value => !value);
     if (!this.showForm()) {
       this.selectedProduct.set(null);
-      this.productForm.reset({
-        pointsMultiplier: 1,
-        minPurchaseForPoints: 1,
-        isActive: true,
-        createdAt: new Date()
-      });
+      this.productForm.reset({ isActive: true });
     }
   }
 
-  calculateCurrentPoints(): number {
-    const formValue = this.productForm.value;
-    if (formValue.quantity && formValue.points) {
-      return new Product(
-        0, '', 0, '', '', '', 0, formValue.points,
-        formValue.pointsMultiplier,
-        formValue.minPurchaseForPoints,
-        formValue.maxPointsPerPurchase,
-        formValue.isPointsProduct
-      ).calculatePoints(formValue.quantity);
-    }
-    return 0;
+  getCategoryName(categoryId: string): string {
+    const category = this.categories().find(c => c.id === categoryId);
+    return category ? category.name : 'Categoría no encontrada';
   }
 }

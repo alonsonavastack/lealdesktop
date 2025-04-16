@@ -1,6 +1,6 @@
 export class Product {
     constructor(
-        public id: number,
+        public id: string | number = '',  // Allow both string and number types
         public name: string,
         public price: number,
         public image: string,
@@ -32,3 +32,7 @@ export class Product {
         return this.isPointsProduct && this.pointsCost !== undefined && this.pointsCost > 0;
     }
 }
+
+export interface CartItem extends Product {
+    quantity: number;
+  }

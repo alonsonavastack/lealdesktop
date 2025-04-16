@@ -1,118 +1,126 @@
-<div class="min-h-screen bg-gray-100 py-8">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div class="px-6 py-4 bg-yellow-500">
-          <h2 class="text-2xl font-bold text-white">Finalizar Compra</h2>
+<div class="min-h-screen bg-gray-900 py-8">
+  <div class="max-w-2xl mx-auto px-4">
+    <div class="flex items-center mb-6">
+      <button 
+        (click)="goBack()" 
+        class="text-yellow-300 hover:text-yellow-400 mr-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </button>
+      <h1 class="text-2xl font-bold text-yellow-300">Finalizar Compra</h1>
+    </div>
+
+    <div class="bg-gray-800 rounded-lg shadow-xl p-6">
+      <form [formGroup]="checkoutForm()" (ngSubmit)="completeCheckout()" class="space-y-6">
+        <!-- Customer Details -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-yellow-300 mb-2">Nombre Completo</label>
+            <input 
+              type="text" 
+              formControlName="customerName"
+              class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
+          </div>
+
+          <div>
+            <label class="block text-yellow-300 mb-2">Teléfono</label>
+            <input 
+              type="tel" 
+              formControlName="phone"
+              class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
+          </div>
+
+          <div>
+            <label class="block text-yellow-300 mb-2">Email</label>
+            <input 
+              type="email" 
+              formControlName="email"
+              class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
+          </div>
+
+          <div>
+            <label class="block text-yellow-300 mb-2">Dirección de Entrega</label>
+            <input 
+              type="text" 
+              formControlName="address"
+              class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
+          </div>
         </div>
-  
-        <form [formGroup]="checkoutForm" (ngSubmit)="completeCheckout()" class="p-6 space-y-6">
-          <!-- Customer Information -->
+
+        <!-- Order Summary -->
+        <div class="border-t border-gray-700 pt-6">
+          <h2 class="text-xl font-bold text-yellow-300 mb-4">Resumen del Pedido</h2>
           <div class="space-y-4">
-            <h3 class="text-lg font-medium text-gray-900">Información del Cliente</h3>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Nombre</label>
-              <input 
-                type="text"
-                formControlName="customerName"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
-            </div>
-  
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Teléfono</label>
-              <input 
-                type="tel"
-                formControlName="phone"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
-            </div>
-  
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Email</label>
-              <input 
-                type="email"
-                formControlName="email"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
-            </div>
-          </div>
-  
-          <!-- Payment Method -->
-          <div class="space-y-4">
-            <h3 class="text-lg font-medium text-gray-900">Método de Pago</h3>
-            
-            <div class="space-y-2">
-              <div class="flex items-center">
-                <input 
-                  type="radio" 
-                  id="cash"
-                  value="cash"
-                  formControlName="paymentMethod"
-                  class="h-4 w-4 text-yellow-500 focus:ring-yellow-500">
-                <label for="cash" class="ml-3 block text-sm font-medium text-gray-700">
-                  Efectivo
-                </label>
-              </div>
-              
-              <div class="flex items-center">
-                <input 
-                  type="radio" 
-                  id="card"
-                  value="card"
-                  formControlName="paymentMethod"
-                  class="h-4 w-4 text-yellow-500 focus:ring-yellow-500">
-                <label for="card" class="ml-3 block text-sm font-medium text-gray-700">
-                  Tarjeta
-                </label>
-              </div>
-  
-              <div class="flex items-center">
-                <input 
-                  type="checkbox"
-                  id="points"
-                  formControlName="points"
-                  class="h-4 w-4 text-yellow-500 focus:ring-yellow-500">
-                <label for="points" class="ml-3 block text-sm font-medium text-gray-700">
-                  Usar Puntos Disponibles
-                </label>
-              </div>
-            </div>
-          </div>
-  
-          <!-- Order Summary -->
-          <div class="space-y-4">
-            <h3 class="text-lg font-medium text-gray-900">Resumen de la Orden</h3>
-            
-            <div class="bg-gray-50 rounded-lg p-4">
-              <div class="space-y-2">
-                <div class="flex justify-between text-sm text-gray-600">
-                  <span>Subtotal</span>
-                  <span>$150.00</span>
+            @for (item of cartItems(); track item.id) {
+              <div class="flex items-center space-x-4">
+                <img [src]="item.image" [alt]="item.name" class="w-16 h-16 object-cover rounded">
+                <div class="flex-1">
+                  <h3 class="text-yellow-300">{{ item.name }}</h3>
+                  <p class="text-gray-400">
+                    {{ item.quantity }}x ${{ item.price }} | {{ item.points }} puntos
+                  </p>
                 </div>
-                <div class="flex justify-between text-sm text-gray-600">
-                  <span>Puntos a Ganar</span>
-                  <span>15 pts</span>
-                </div>
-                <div class="flex justify-between text-base font-medium text-gray-900 pt-2 border-t">
-                  <span>Total</span>
-                  <span>$150.00</span>
-                </div>
+                <span class="text-yellow-300">${{ item.price * item.quantity }}</span>
               </div>
+            }
+          </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="border-t border-gray-700 pt-6">
+          <h2 class="text-xl font-bold text-yellow-300 mb-4">Método de Pago</h2>
+          <select 
+            formControlName="paymentMethod"
+            class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
+            <option value="cash">Efectivo</option>
+            <option value="card">Tarjeta</option>
+            <option value="transfer">Transferencia</option>
+          </select>
+
+          <div class="flex items-center mt-4">
+            <input 
+              type="checkbox" 
+              formControlName="usePoints"
+              id="usePoints"
+              class="w-4 h-4 text-yellow-300 bg-gray-700 border-gray-600 rounded">
+            <label for="usePoints" class="ml-2 text-yellow-300">
+              Usar puntos disponibles
+            </label>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="border-t border-gray-700 pt-6">
+          <div class="space-y-2">
+            <div class="flex justify-between text-yellow-300">
+              <span>Subtotal:</span>
+              <span>${{ totalAmount() }}</span>
+            </div>
+            <div class="flex justify-between text-yellow-300">
+              <span>Puntos a ganar:</span>
+              <span>{{ totalPoints() }}</span>
             </div>
           </div>
-  
-          <!-- Submit Button -->
-          <div class="pt-4">
-            <button 
-              type="submit"
-              [disabled]="!checkoutForm.valid || isLoading()"
-              class="w-full bg-yellow-500 text-white py-3 px-4 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
-              @if (isLoading()) {
-                <span>Procesando...</span>
-              } @else {
-                <span>Completar Compra</span>
-              }
-            </button>
-          </div>
-        </form>
-      </div>
+
+          <button 
+            type="submit"
+            [disabled]="!checkoutForm().valid || isLoading()"
+            class="mt-6 w-full bg-yellow-500 text-gray-900 px-4 py-3 rounded-lg hover:bg-yellow-400 transition-colors disabled:opacity-50">
+            @if (isLoading()) {
+              <span class="flex items-center justify-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Procesando...
+              </span>
+            } @else {
+              Completar Compra
+            }
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+</div>

@@ -14,7 +14,7 @@ export interface Order {
 }
 
 export interface OrderItem {
-    productId: number;  // Changed to number to match Product.id
+    productId: string;  // Changed to string to match Firebase IDs
     name: string;
     price: number;
     quantity: number;

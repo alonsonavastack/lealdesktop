@@ -1,14 +1,16 @@
+import firebase from 'firebase/compat/app';
 export interface User {
-    uid: string,
-    name: string,
-    email: string,
-    password: string,
-    phone: string,
-    address: string,
-    img: string
-    createdAt?: Date;
-    updatedAt?: Date;
-    isActive?: boolean;
-    role?: 'admin' | 'user';
-    lastLogin?: Date;
+    uid: string | null;
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+    address: string;
+    img: string;
+    points: number;
+    createdAt: Date | firebase.firestore.Timestamp;
+    updatedAt: Date | firebase.firestore.Timestamp | null;
+    isActive: boolean;
+    role: string;
+    lastLogin: Date | firebase.firestore.Timestamp | null;
 }
