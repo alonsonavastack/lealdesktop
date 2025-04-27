@@ -108,18 +108,32 @@ export class UsuariosComponent implements OnInit {
     }
   }
 
-  editUser(user: User) {
-    const userToEdit = { ...user };
+  editUser(user: any) {
+    // Crear una copia profunda del usuario
+    const userToEdit = JSON.parse(JSON.stringify(user));
+    
+    // Eliminar la contraseña del formulario
     delete userToEdit.password;
+    
+    // Establecer el usuario seleccionado
     this.selectedUser.set(user);
     
+    // Actualizar validadores de contraseña
     if (this.userForm.get('password')) {
       this.userForm.get('password')?.clearValidators();
       this.userForm.get('password')?.setValidators([Validators.minLength(6)]);
       this.userForm.get('password')?.updateValueAndValidity();
     }
     
-    this.userForm.patchValue(userToEdit);
+    // Actualizar el formulario con los datos del usuario
+    this.userForm.patchValue({
+      ...userToEdit,
+      uid: user.uid,
+      role: user.role || 'client',
+      isActive: user.isActive !== undefined ? user.isActive : true
+    });
+    
+    // Mostrar el formulario
     this.showForm.set(true);
   }
 

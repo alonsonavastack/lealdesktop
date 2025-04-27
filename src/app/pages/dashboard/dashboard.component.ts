@@ -27,6 +27,6 @@ export class DashboardComponent {
 
   logout() {
     localStorage.removeItem('user');
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/main']);
   }
 }

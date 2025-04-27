@@ -9,7 +9,7 @@ import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-auth',
-  imports: [CommonModule,FormsModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule,FormsModule, ReactiveFormsModule],
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.css'
 })

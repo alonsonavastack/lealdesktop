@@ -206,4 +206,41 @@ export class FirebaseService {
         this._loading.set(false);
       }
     }
+
+  async getCurrentUser() {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      return JSON.parse(userData);
+    }
+    return null;
+  }
+
+  async register(userData: User) {
+    this._loading.set(true);
+    try {
+      // Create user in Firebase Auth
+      const auth = getAuth();
+      const result = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
+      
+      // Add additional user data to Firestore
+      const user: User = {
+        ...userData,
+        uid: result.user.uid,
+        createdAt: new Date(),
+        updatedAt: null,
+        lastLogin: new Date(),
+        points: 0
+      };
+      
+      // Store in Firestore
+      await this.setDocument(`users/${result.user.uid}`, user);
+      
+      return result;
+    } catch (error: any) {
+      this._error.set(error.message);
+      throw error;
+    } finally {
+      this._loading.set(false);
+    }
+  }
 }

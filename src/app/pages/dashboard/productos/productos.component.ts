@@ -77,6 +77,11 @@ export class ProductosComponent implements OnInit {
       
       try {
         if (this.selectedProduct()) {
+          // Validación adicional del ID
+          if (!this.selectedProduct()?.id) {
+            throw new Error('ID de producto no válido');
+          }
+          
           const productId = this.selectedProduct()!.id;
           await this.firebaseSvc.updateDocument(`products/${productId}`, {
             ...formData,
@@ -103,8 +108,9 @@ export class ProductosComponent implements OnInit {
           isPointsProduct: false
         });
         this.selectedProduct.set(null);
-      } catch (error) {
-        this.toast.error('Error al guardar el producto');
+      } catch (error: any) {
+        this.toast.error(error.message || 'Error al guardar el producto');
+        console.error('Error en onSubmit:', error);
       } finally {
         this.isLoading.set(false);
       }
@@ -133,9 +139,19 @@ export class ProductosComponent implements OnInit {
   }
 
   editProduct(product: Product) {
-    this.selectedProduct.set(product);
-    this.productForm.patchValue(product);
-    this.showForm.set(true);
+      if (!product || !product.id) {
+        this.toast.error('Producto no válido');
+        return;
+      }
+      
+      this.selectedProduct.set(product);
+      this.productForm.patchValue({
+        ...product,
+        category: product.category || '',
+        pointsCost: product.pointsCost || null,
+        maxPointsPerPurchase: product.maxPointsPerPurchase || null
+      });
+      this.showForm.set(true);
   }
 
   async deleteProduct(id: string | number) {

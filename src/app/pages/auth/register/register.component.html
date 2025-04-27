@@ -1,1 +1,105 @@
-<p>register works!</p>
+<div class="min-h-screen bg-gray-900 p-4 sm:p-6 lg:p-8">
+  <div class="max-w-md mx-auto">
+    <div class="bg-gray-800 rounded-lg shadow-xl p-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-yellow-300">Crear Cuenta</h2>
+        <p class="text-gray-400 mt-2">Completa tus datos para registrarte</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+        <!-- Nombre -->
+        <div>
+          <label class="block text-yellow-300 mb-2">Nombre</label>
+          <input 
+            type="text" 
+            formControlName="name"
+            class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5 focus:ring-yellow-300 focus:border-yellow-300"
+            placeholder="Tu nombre completo">
+          
+          @if (form.get('name')?.errors?.['required'] && form.get('name')?.touched) {
+            <p class="text-red-500 text-sm mt-1">El nombre es requerido</p>
+          }
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-yellow-300 mb-2">Email</label>
+          <input 
+            type="email" 
+            formControlName="email"
+            class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5 focus:ring-yellow-300 focus:border-yellow-300"
+            placeholder="correo@ejemplo.com">
+          
+          @if (form.get('email')?.errors?.['required'] && form.get('email')?.touched) {
+            <p class="text-red-500 text-sm mt-1">El email es requerido</p>
+          }
+          @if (form.get('email')?.errors?.['email'] && form.get('email')?.touched) {
+            <p class="text-red-500 text-sm mt-1">Email inválido</p>
+          }
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label class="block text-yellow-300 mb-2">Contraseña</label>
+          <input 
+            type="password" 
+            formControlName="password"
+            class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5 focus:ring-yellow-300 focus:border-yellow-300"
+            placeholder="••••••">
+          
+          @if (form.get('password')?.errors?.['required'] && form.get('password')?.touched) {
+            <p class="text-red-500 text-sm mt-1">La contraseña es requerida</p>
+          }
+          @if (form.get('password')?.errors?.['minlength'] && form.get('password')?.touched) {
+            <p class="text-red-500 text-sm mt-1">La contraseña debe tener al menos 6 caracteres</p>
+          }
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-yellow-300 mb-2">Teléfono</label>
+          <input 
+            type="tel" 
+            formControlName="phone"
+            class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5 focus:ring-yellow-300 focus:border-yellow-300"
+            placeholder="(123) 456-7890">
+          
+          @if (form.get('phone')?.errors?.['required'] && form.get('phone')?.touched) {
+            <p class="text-red-500 text-sm mt-1">El teléfono es requerido</p>
+          }
+        </div>
+
+        <!-- Dirección -->
+        <div>
+          <label class="block text-yellow-300 mb-2">Dirección</label>
+          <textarea 
+            formControlName="address"
+            rows="2"
+            class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5 focus:ring-yellow-300 focus:border-yellow-300"
+            placeholder="Tu dirección completa"></textarea>
+          
+          @if (form.get('address')?.errors?.['required'] && form.get('address')?.touched) {
+            <p class="text-red-500 text-sm mt-1">La dirección es requerida</p>
+          }
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit"
+          [disabled]="!form.valid"
+          class="w-full px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Crear Cuenta
+        </button>
+
+        <!-- Login Link -->
+        <div class="text-center text-gray-400">
+          <p>¿Ya tienes una cuenta?
+            <a routerLink="/auth/login" class="text-yellow-300 hover:text-yellow-400">
+              Inicia Sesión
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,52 @@
 <router-outlet />
+
+<button *ngIf="deferredPrompt" (click)="installPWA()" class="install-button">
+  Instalar aplicación
+</button>
+
+<!-- Modal de Instalación PWA -->
+@if (showInstallModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm"></div>
+    
+    <!-- Modal -->
+    <div class="relative bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full">
+      <div class="flex items-center space-x-4 mb-4">
+        <img src="assets/icons/icon-192x192.png" alt="App Icon" class="w-16 h-16 rounded-lg">
+        <div>
+          <h3 class="text-xl font-bold text-yellow-300">Instalar Mooky App</h3>
+          <p class="text-gray-400">Instala nuestra app para una mejor experiencia</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <div class="flex items-center space-x-3 text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Acceso rápido desde tu pantalla de inicio</span>
+        </div>
+        <div class="flex items-center space-x-3 text-gray-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-300" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+          <span>Experiencia sin conexión</span>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <button 
+          (click)="closeInstallModal()"
+          class="px-4 py-2 text-yellow-300 hover:bg-gray-700 rounded-lg transition-colors">
+          Ahora no
+        </button>
+        <button 
+          (click)="installPWA()"
+          class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold rounded-lg transition-colors">
+          Instalar
+        </button>
+      </div>
+    </div>
+  </div>
+}

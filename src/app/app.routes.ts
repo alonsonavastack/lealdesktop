@@ -33,6 +33,7 @@ export const routes: Routes = [
             { path: 'category', loadComponent: () => import('./pages/dashboard/categorias/categorias.component').then(m => m.CategoriasComponent) },
             { path: 'sales', loadComponent: () => import('./pages/dashboard/ventas/ventas.component').then(m => m.VentasComponent) },
             { path: 'orders', loadComponent: () => import('./pages/dashboard/orders/orders.component').then(m => m.OrdersComponent) },
+            { path: 'sumar', loadComponent: () => import('./pages/dashboard/sumar-estrellas/sumar-estrellas.component').then(m => m.SumarEstrellasComponent) },
             { path: '', redirectTo: 'users', pathMatch: 'full' }
         ]
     },

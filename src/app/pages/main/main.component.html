@@ -3,10 +3,13 @@
   <header class="bg-gray-800 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
       <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-yellow-300">Leal Desktop</h1>
+        <div class="flex items-center space-x-3">
+          <img src="assets/icons/icon-192x192.png" alt="Mooky Logo" class="h-8 w-8">
+          <h1 class="text-2xl font-bold text-yellow-300">Mooky - Milk Tea</h1>
+        </div>
         
         <div class="flex items-center space-x-4">
-          <!-- Cart Button -->
+          <!-- Cart Button 
           <button 
             (click)="toggleCart()"
             class="relative text-yellow-300 hover:text-yellow-400">
@@ -19,7 +22,7 @@
               </span>
             }
           </button>
-
+          -->
           <!-- User Menu -->
           <div class="relative">
             @if (!isLoggedIn()) {
@@ -96,18 +99,20 @@
               <p class="text-gray-400 mt-2">{{ product.description }}</p>
               <div class="mt-4 flex justify-between items-center">
                 <span class="text-yellow-300">${{ product.price }}</span>
+                <!--
                 @if (product.isPointsProduct) {
                   <span class="text-green-500">{{ product.pointsCost }} pts</span>
                 } @else {
                   <span class="text-yellow-300">{{ product.points }} puntos</span>
-                }
+                } -->
               </div>
+              <!--
               <button 
                 (click)="addToCart(product)"
                 [disabled]="product.quantity <= 0"
                 class="mt-4 w-full bg-yellow-500 text-gray-900 px-4 py-2 rounded-lg hover:bg-yellow-400 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed">
                 {{ product.quantity > 0 ? 'Agregar al Carrito' : 'Sin Stock' }}
-              </button>
+              </button> -->
             </div>
           </div>
         }

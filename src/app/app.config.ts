@@ -1,4 +1,4 @@
-import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { initializeApp } from 'firebase/app';
 import { routes } from './app.routes';
@@ -7,6 +7,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { provideHotToastConfig } from '@ngxpert/hot-toast';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyA-9Y0tFmUUssVZD-DcJPzaRnK7FeBXCSU",
@@ -31,7 +32,11 @@ export const appConfig: ApplicationConfig = {
       AngularFireModule.initializeApp(firebaseConfig),
       AngularFirestoreModule
     ), 
-    provideHotToastConfig(),
+    provideHotToastConfig(), 
+    provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
     
   ]
 };
