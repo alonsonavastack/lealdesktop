@@ -10,7 +10,7 @@
     </div>
 
     @if (showForm()) {
-      <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
+      <div id="editForm" class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
         <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Name -->
@@ -44,15 +44,6 @@
                 class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
             </div>
 
-            <!-- Quantity -->
-            <div>
-              <label class="block text-yellow-300 mb-2">Cantidad</label>
-              <input 
-                type="number" 
-                formControlName="quantity"
-                class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
-            </div>
-
             <!-- Image URL -->
             <div>
               <label class="block text-yellow-300 mb-2">URL de Imagen</label>
@@ -71,64 +62,6 @@
                 rows="3"
                 class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5"></textarea>
             </div>
-          </div>
-
-          <!-- Points System -->
-          <div class="border-t border-gray-700 pt-6">
-            <h4 class="text-yellow-300 text-lg font-bold mb-4">Sistema de Puntos</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-yellow-300 mb-2">Puntos Base</label>
-                <input 
-                  type="number" 
-                  formControlName="points"
-                  class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
-              </div>
-
-              <div>
-                <label class="block text-yellow-300 mb-2">Multiplicador</label>
-                <input 
-                  type="number" 
-                  formControlName="pointsMultiplier"
-                  class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
-              </div>
-
-              <div>
-                <label class="block text-yellow-300 mb-2">Compra Mínima para Puntos</label>
-                <input 
-                  type="number" 
-                  formControlName="minPurchaseForPoints"
-                  class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
-              </div>
-
-              <div>
-                <label class="block text-yellow-300 mb-2">Puntos Máximos por Compra</label>
-                <input 
-                  type="number" 
-                  formControlName="maxPointsPerPurchase"
-                  class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <label class="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  formControlName="isPointsProduct"
-                  class="form-checkbox h-5 w-5 text-yellow-300 rounded">
-                <span class="text-yellow-300">Producto canjeable por puntos</span>
-              </label>
-            </div>
-
-            @if (productForm.get('isPointsProduct')?.value) {
-              <div class="mt-4">
-                <label class="block text-yellow-300 mb-2">Costo en Puntos</label>
-                <input 
-                  type="number" 
-                  formControlName="pointsCost"
-                  class="w-full bg-gray-700 border border-gray-600 text-yellow-300 rounded-lg p-2.5">
-              </div>
-            }
           </div>
 
           <!-- Active Status -->
@@ -168,15 +101,10 @@
           <img [src]="product.image" [alt]="product.name" class="w-full h-48 object-cover">
           <div class="p-4">
             <h3 class="text-xl font-bold text-yellow-300">{{ product.name }}</h3>
-            <p class="text-gray-400 mt-2">{{ product.description }}</p>
+            <p class="text-gray-400 mt-2 whitespace-pre-line">{{ product.description }}</p>
             <p class="text-gray-400 mt-1">Categoría: {{ getCategoryName(product.category) }}</p>
             <div class="mt-4 space-y-2">
               <p class="text-yellow-300">${{ product.price }}</p>
-              <p class="text-gray-400">Stock: {{ product.quantity }}</p>
-              <p class="text-gray-400">Puntos: {{ product.points }}</p>
-              @if (product.isPointsProduct) {
-                <p class="text-yellow-300">Canjeable por {{ product.pointsCost }} puntos</p>
-              }
             </div>
             <div class="mt-4 flex justify-between items-center">
               <span class="text-sm">

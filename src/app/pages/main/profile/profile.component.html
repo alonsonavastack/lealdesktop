@@ -20,15 +20,28 @@
             class="w-24 h-24 rounded-full object-cover border-4 border-yellow-500">
         </div>
         <div class="flex-1">
-          <h1 class="text-2xl font-bold text-yellow-300">{{ user.name }}</h1>
-          <p class="text-gray-400">{{ user.email }}</p>
-          <div class="mt-2 flex flex-wrap gap-4">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-700 text-yellow-300">
-              Miembro desde {{ user.joinDate | date:'MMM yyyy' }}
-            </span>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-700 text-yellow-300">
-              {{ user.totalPoints }} puntos acumulados
-            </span>
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 class="text-2xl font-bold text-yellow-300">{{ user.name }}</h1>
+              <p class="text-gray-400">{{ user.email }}</p>
+              <div class="mt-2 flex flex-wrap gap-4">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-700 text-yellow-300">
+                  Miembro desde {{ user.joinDate | date:'MMM yyyy' }}
+                </span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-700 text-yellow-300">
+                  {{ user.totalPoints }} puntos acumulados
+                </span>
+              </div>
+            </div>
+            
+            <!-- QR Code Section -->
+            <div class="flex flex-col items-center bg-gray-700 p-4 rounded-lg">
+              <img 
+                [src]="user.qrCode" 
+                [alt]="'QR de ' + user.name"
+                class="w-32 h-32 md:w-24 md:h-24 lg:w-32 lg:h-32 object-contain bg-white p-2 rounded-lg">
+              <span class="text-sm text-yellow-300 mt-2">Tu código personal</span>
+            </div>
           </div>
         </div>
       </div>

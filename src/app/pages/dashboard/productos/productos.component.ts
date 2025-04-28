@@ -33,13 +33,6 @@ export class ProductosComponent implements OnInit {
       image: ['', [Validators.required, Validators.pattern('https?://.+')]],
       description: ['', [Validators.required]],
       category: ['', [Validators.required]],
-      quantity: [0, [Validators.required, Validators.min(0)]],
-      points: [0, [Validators.required, Validators.min(0)]],
-      pointsMultiplier: [1, [Validators.required, Validators.min(1)]],
-      minPurchaseForPoints: [1, [Validators.required, Validators.min(1)]],
-      maxPointsPerPurchase: [null],
-      isPointsProduct: [false],
-      pointsCost: [null],
       isActive: [true]
     });
   }
@@ -144,14 +137,40 @@ export class ProductosComponent implements OnInit {
         return;
       }
       
-      this.selectedProduct.set(product);
-      this.productForm.patchValue({
-        ...product,
-        category: product.category || '',
-        pointsCost: product.pointsCost || null,
-        maxPointsPerPurchase: product.maxPointsPerPurchase || null
-      });
+      // Primero activamos el formulario
       this.showForm.set(true);
+      
+      // Esperamos un momento mínimo para que el DOM se actualice
+      setTimeout(() => {
+        // Luego actualizamos el formulario y hacemos el scroll
+        this.selectedProduct.set(product);
+        
+        // Asegurarnos de que tenemos las categorías cargadas
+        if (this.categories().length === 0) {
+          this.loadCategories().then(() => {
+            this.setProductFormValues(product);
+          });
+        } else {
+          this.setProductFormValues(product);
+        }
+        
+        const element = document.getElementById('editForm');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 0);
+  }
+
+  // Método auxiliar para establecer los valores del formulario
+  private setProductFormValues(product: Product) {
+    this.productForm.patchValue({
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      description: product.description,
+      category: product.category,
+      isActive: product.isActive !== undefined ? product.isActive : true
+    });
   }
 
   async deleteProduct(id: string | number) {

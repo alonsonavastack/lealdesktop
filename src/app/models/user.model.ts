@@ -8,6 +8,7 @@ export interface User {
     address: string;
     img: string;
     points: number;
+    qrCode: string;  // Nuevo campo para el QR
     createdAt: Date | firebase.firestore.Timestamp;
     updatedAt: Date | firebase.firestore.Timestamp | null;
     isActive: boolean;

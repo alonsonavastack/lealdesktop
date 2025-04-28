@@ -1,14 +1,16 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FirebaseService } from '../../../services/firebase.service';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { signal } from '@angular/core';
 
 interface User {
   name: string;
   email: string;
-  img: string;  // Cambiado de profileImage a img para coincidir con el template
+  img: string;
+  qrCode: string;  // Agregamos el campo qrCode
   joinDate: Date;
   totalPoints: number;
   availablePoints: number;
@@ -44,7 +46,8 @@ export class ProfileComponent implements OnInit {
   user: User = {
     name: '',
     email: '',
-    img: '',  // Cambiado de profileImage a img
+    img: '',
+    qrCode: '',  // Inicializamos el campo qrCode
     joinDate: new Date(),
     totalPoints: 0,
     availablePoints: 0,
@@ -185,7 +188,8 @@ export class ProfileComponent implements OnInit {
         this.user = {
           name: userData['name'] || '',
           email: userData['email'] || '',
-          img: userData['img'] || '',  // Mantener compatibilidad con el campo existente
+          img: userData['img'] || '',
+          qrCode: userData['qrCode'] || '', // Cargamos el QR del usuario
           joinDate: userData['createdAt']?.toDate() || new Date(),
           totalPoints: userData['points'] || 0,
           availablePoints: userData['points'] || 0,

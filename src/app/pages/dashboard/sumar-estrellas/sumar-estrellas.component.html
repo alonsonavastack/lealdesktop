@@ -24,6 +24,15 @@
                   <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                 </svg>
               </button>
+              <!-- Nuevo botón para escanear QR -->
+              <button 
+                type="button"
+                (click)="openQRScanner()"
+                class="bg-yellow-500 text-gray-900 px-4 rounded-lg hover:bg-yellow-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clip-rule="evenodd"/>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -66,10 +75,10 @@
 
       <!-- Historial de Puntos -->
       <div class="bg-gray-800 rounded-lg shadow-xl p-6 h-[calc(100vh-8rem)]">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
           <h2 class="text-yellow-300 text-xl font-bold">Historial de Puntos</h2>
           @if (selectedCustomer) {
-            <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
               <div class="flex items-center">
                 <span class="text-gray-400 mr-2">Total de puntos:</span>
                 <span class="text-yellow-300 text-xl mr-2">{{ getTotalPoints() }}</span>
@@ -82,7 +91,7 @@
               </div>
               <button 
                 (click)="openReducePointsModal()"
-                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                class="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
                 [disabled]="getTotalPoints() < 100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
@@ -204,7 +213,8 @@
               <div>
                 <p class="text-yellow-300 font-medium">{{ record.customerName }}</p>
                 <p class="text-gray-400 text-sm">Monto: ${{ record.totalAmount }}</p>
-                <p class="text-gray-400 text-sm mt-2">{{ record.date | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p class="text-gray-400 text-sm mt-2">{{ record.date.toDate() | date:'dd/MM/yyyy HH:mm' }}</p>
+                
               </div>
               <div class="flex items-center gap-4">
                 <div class="flex items-center">
@@ -216,6 +226,7 @@
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                   </svg>
                 </div>
+                <!--
                 <div class="flex gap-2">
                   <button 
                     (click)="editPointsRecord(record)"
@@ -232,6 +243,7 @@
                     </svg>
                   </button>
                 </div>
+                -->
               </div>
             </div>
           </div>
@@ -370,6 +382,33 @@
           {{ isLoading ? 'Procesando...' : 'Reducir Puntos' }}
         </button>
       </form>
+    </div>
+  </div>
+}
+
+<!-- Modal para Escáner QR -->
+@if (showQRModal()) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-yellow-300 text-lg font-bold">Escanear Código QR</h3>
+        <button 
+          (click)="closeQRModal()"
+          class="text-gray-400 hover:text-gray-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="qr-scanner-container">
+        <zxing-scanner
+          [enable]="showQRModal()"
+          (scanSuccess)="onQRCodeScanned($event)"
+          [formats]="allowedFormats"
+          [tryHarder]="true">
+        </zxing-scanner>
+      </div>
     </div>
   </div>
 }

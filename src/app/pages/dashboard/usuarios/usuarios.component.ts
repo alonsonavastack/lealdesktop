@@ -1,110 +1,138 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { User } from '../../../models/user.model';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { FirebaseService } from '../../../services/firebase.service';
-import { HotToastService } from '@ngxpert/hot-toast';
 import { UtilsService } from '../../../services/utils.service';
+import { HotToastService } from '@ngxpert/hot-toast';
+import { User } from '../../../models/user.model';
+import { signal } from '@angular/core';
+import QRCode from 'qrcode';
 
 @Component({
   selector: 'app-usuarios',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './usuarios.component.html',
+  templateUrl: './usuarios.component.html'
 })
-export class UsuariosComponent implements OnInit {
-  firebaseService = inject(FirebaseService);
-  toast = inject(HotToastService);
-  utilsService = inject(UtilsService);
+export class UsuariosComponent {
+  private fb = inject(FormBuilder);
+  private firebaseService = inject(FirebaseService);
+  private utilsService = inject(UtilsService);
+  private toast = inject(HotToastService);
+
   users = signal<User[]>([]);
-  isLoading = signal<boolean>(false);
-  showForm = signal<boolean>(false);
+  showForm = signal(false);
+  isLoading = signal(false);
   selectedUser = signal<User | null>(null);
 
   userForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
+    this.initForm();
+    this.getUsers();
+  }
+
+  private initForm(): void {
     this.userForm = this.fb.group({
-      uid: [null],
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      phone: ['', [Validators.required]],
-      address: ['', [Validators.required]],
-      img: ['https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg'],
-      role: ['client', [Validators.required]],
+      phone: [''],
+      address: [''],
+      role: ['user'],
       isActive: [true],
+      img: ['https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg'],
+      points: [0],
       createdAt: [new Date()],
       updatedAt: [null],
       lastLogin: [null]
     });
   }
 
-  ngOnInit() {
-    this.getUsers();
-  }
-
-  onSubmit() {
+  async onSubmit() {
     if (this.userForm.valid) {
       this.isLoading.set(true);
       const formData = this.userForm.value;
       
-      const userId = this.selectedUser()?.uid || formData.uid || Date.now().toString();
-      
-      let user: User = {
-        ...formData,
-        uid: userId,
-        updatedAt: new Date()
-      };
+      try {
+        // Verificar si el correo ya existe
+        const users = await this.firebaseService.getCollectionData('users');
+        const emailExists = users.some((user: any) => 
+          user.email === formData.email && 
+          (!this.selectedUser() || user.uid !== this.selectedUser()?.uid)
+        );
 
-      // Always encrypt password for new users
-      if (!this.selectedUser()) {
-        console.log('Encrypting new password:', formData.password); // Debug log
-        user.password = this.utilsService.encrypt(formData.password);
-      } 
-      // Handle password updates for existing users
-      else if (formData.password && formData.password.trim() !== '') {
-        console.log('Encrypting updated password:', formData.password); // Debug log
-        user.password = this.utilsService.encrypt(formData.password);
-      } else {
-        user.password = this.selectedUser().password;
-      }
-
-      console.log('Final password value:', user.password); // Debug log
-
-      this.firebaseService.setDocument(`users/${userId}`, user)
-        .then(() => {
-          this.getUsers();
-          this.showForm.set(false);
-          this.selectedUser.set(null);
-          this.userForm.reset({ 
-            role: 'user', 
-            isActive: true,
-            img: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg'
+        if (emailExists) {
+          this.toast.error(`El correo ${formData.email} ya está registrado`, {
+            duration: 3000,
+            position: 'top-right',
+            icon: '⚠️'
           });
-          this.toast.success(
-            this.selectedUser() ? 'Usuario actualizado con éxito!' : 'Usuario creado con éxito!',
-            {
-              duration: 2000,
-              position: 'top-right',
-              icon: '👏',
-            }
-          );
-        })
-        .catch(error => {
-          console.error(error);
-          this.toast.error(
-            this.selectedUser() ? 'Error al actualizar usuario' : 'Error al crear usuario',
-            {
-              duration: 2000,
-              position: 'top-right',
-              icon: '😢',
-            }
-          );
-        })
-        .finally(() => {
           this.isLoading.set(false);
+          return;
+        }
+
+        const userId = this.selectedUser()?.uid || formData.uid || Date.now().toString();
+        
+        // Generar datos para el QR
+        const qrData = {
+          userId: userId,
+          name: formData.name,
+          email: formData.email,
+          points: formData.points
+        };
+
+        // Generar QR como URL de datos
+        const qrCodeUrl = await QRCode.toDataURL(JSON.stringify(qrData));
+        
+        let user: User = {
+          ...formData,
+          uid: userId,
+          qrCode: qrCodeUrl,
+          updatedAt: new Date()
+        };
+
+        // Manejar contraseña
+        if (!this.selectedUser()) {
+          user.password = this.utilsService.encrypt(formData.password);
+        } else if (formData.password && formData.password.trim() !== '') {
+          user.password = this.utilsService.encrypt(formData.password);
+        } else {
+          user.password = this.selectedUser().password;
+        }
+
+        await this.firebaseService.setDocument(`users/${userId}`, user);
+        
+        this.getUsers();
+        this.showForm.set(false);
+        this.selectedUser.set(null);
+        this.userForm.reset({
+          role: 'user',
+          isActive: true,
+          img: 'https://icon-library.com/images/avatar-icon-images/avatar-icon-images-4.jpg'
         });
+        
+        this.toast.success(
+          this.selectedUser() ? 'Usuario actualizado con éxito!' : 'Usuario creado con éxito!',
+          {
+            duration: 2000,
+            position: 'top-right',
+            icon: '👏',
+          }
+        );
+      } catch (error) {
+        console.error('Error:', error);
+        this.toast.error(
+          'Error al procesar el usuario',
+          {
+            duration: 2000,
+            position: 'top-right',
+            icon: '😢',
+          }
+        );
+      } finally {
+        this.isLoading.set(false);
+      }
     }
   }
 

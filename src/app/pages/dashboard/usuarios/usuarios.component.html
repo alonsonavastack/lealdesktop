@@ -42,7 +42,7 @@
 
             @if (!selectedUser()) {
               <div>
-                <label class="block text-yellow-300 mb-2">Contraseña</label>
+                <label class="block text-yellow-300 mb-2">Contraseña - Mininmo 6 digitos</label>
                 <input 
                   type="password" 
                   formControlName="password"
@@ -154,23 +154,22 @@
         @for (user of users(); track user.uid) {
           <div class="bg-gray-800 rounded-lg shadow-xl p-6">
             <div class="flex items-center space-x-4">
-              <img [src]="user.img || 'assets/default-avatar.png'" 
+              <img [src]="user.img" 
                    [alt]="user.name" 
                    class="w-16 h-16 rounded-full object-cover">
               <div>
-                <h3 class="text-yellow-300 font-bold text-lg">{{ user.name }}</h3>
+                <h3 class="text-yellow-300 font-bold">{{ user.name }}</h3>
                 <p class="text-gray-400">{{ user.email }}</p>
               </div>
             </div>
             
-            <div class="mt-4 space-y-2">
-              <p class="text-gray-400">{{ user.phone }}</p>
-              <p class="text-gray-400">{{ user.address }}</p>
-              <p class="text-yellow-300">
-                Rol: {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
-              </p>
+            <!-- QR Code Section -->
+            <div class="mt-4 flex justify-center">
+              <img [src]="user.qrCode" 
+                   [alt]="'QR Code de ' + user.name" 
+                   class="w-32 h-32">
             </div>
-
+            
             <div class="mt-4 flex justify-between items-center">
               <span class="text-sm">
                 @if (user.isActive) {

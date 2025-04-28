@@ -5,7 +5,8 @@ import { User } from '../../../models/user.model';
 import { FirebaseService } from '../../../services/firebase.service';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { PointsService } from '../../../services/points.service';
-
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { BarcodeFormat } from '@zxing/library';
 
 interface PointsRecord {
   id: string;
@@ -19,11 +20,13 @@ interface PointsRecord {
 @Component({
   selector: 'app-sumar-estrellas',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ZXingScannerModule],
   templateUrl: './sumar-estrellas.component.html',
   styleUrl: './sumar-estrellas.component.css'
 })
 export class SumarEstrellasComponent {
+  // Add this property
+  allowedFormats = [BarcodeFormat.QR_CODE];
   firebaseService = inject(FirebaseService);
   pointsService = inject(PointsService);  // Properly inject PointsService
   private toast = inject(HotToastService);
@@ -44,7 +47,8 @@ export class SumarEstrellasComponent {
   // Propiedades
   showReducePointsModal = signal(false);
   reducePointsForm: FormGroup;
-  
+  showQRModal = signal(false);
+
   // Constructor
   constructor(private fb: FormBuilder) {
     this.reducePointsForm = this.fb.group({
@@ -358,5 +362,40 @@ export class SumarEstrellasComponent {
 
   getTotalPoints(): number {
     return this.pointsHistory().reduce((sum, record) => sum + (record.points || 0), 0);
+  }
+
+  openQRScanner() {
+    this.showQRModal.set(true);
+  }
+
+  closeQRModal() {
+    this.showQRModal.set(false);
+  }
+
+  async onQRCodeScanned(result: string) {
+    try {
+      const qrData = JSON.parse(result);
+      if (qrData.userId) {
+        const userData = await this.firebaseService.getDocument(`users/${qrData.userId}`);
+        if (userData) {
+          const customer = {
+            uid: qrData.userId,
+            name: userData['name'],
+            email: userData['email'],
+            phone: userData['phone'],
+            points: userData['points'] || 0
+          };
+          this.selectCustomer(customer);
+          this.closeQRModal();
+        } else {
+          this.toast.error('Usuario no encontrado');
+        }
+      } else {
+        this.toast.error('QR inválido');
+      }
+    } catch (error) {
+      console.error('Error al procesar QR:', error);
+      this.toast.error('Error al procesar el código QR');
+    }
   }
 }
